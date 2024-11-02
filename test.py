@@ -7,9 +7,8 @@ def git_sync():
     print(f"Running sync at {datetime.datetime.now()}")
 
 def run_scheduler(interval='daily'):
-    # Configure the schedule based on interval
     if interval == 'each_minute':
-        schedule.every().minute.do(git_sync)
+        schedule.every().minutes.do(git_sync)
     elif interval == 'each_30_minutes':
         schedule.every(30).minutes.do(git_sync)
     elif interval == 'each_hour':
