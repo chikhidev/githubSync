@@ -172,8 +172,8 @@ def run():
         count += 1
 
     final_message = f">>>>>{count}/{len(dirs)} syncronized without errors"
-    Log(f"\n{final_message}\n\n\n\n")
-    Log("-" * 50)
+    Log(f"\n{final_message}")
+    Log("-" * 50 + "\n\n")
     print(final_message)
 
 # def run():
