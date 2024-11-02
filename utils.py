@@ -135,13 +135,12 @@ def run():
         try:
             push_to_origin(None)
         except Exception as e:
-            if "git branch --set-upstream-to=origin/<branch>" in str(e):
-                print(f"{YELLOW}Branch not set, trying defualt branches[main, master]{RESET}")
-                try:
-                    push_to_origin("main")
-                except:
+            if "git push --set-upstream origin" in str(e):
+                branch = str(e).split(" ")[-1]
+                if branch:
+                    print(f"{BLUE}Trying to push to {branch} branch{RESET}")
                     try:
-                        push_to_origin("master")
+                        push_to_origin(branch)
                     except Exception as e:
                         print(f"{RED}{e}{RESET}")
                         continue
