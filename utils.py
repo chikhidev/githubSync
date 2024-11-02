@@ -1,4 +1,4 @@
-from global_ import data_file, user, SYS, os, json, sys, app_name
+from global_ import data_file, user, SYS, os, json, sys, app_name, subprocess, logs_file, time
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 def check_for_git(dir_path):
@@ -101,8 +101,22 @@ def is_active():
         return False
     return False
 
-
 #--------------------------------------------------------------------------
+def Log(message):
+    try:
+        if not os.path.exists(logs_file):
+            os.system(f"touch {logs_file}") if SYS == "LINUX" else os.system(f"echo. 2> {logs_file}")
+        with open(logs_file, 'a') as f:
+            f.write(f"{message}\n")
+    except Exception as e:
+        print(f"{RED}Error logging the error{RESET}")
+
+def handle_exception(e):
+    Log('-' * 50)
+    Log(e)
+    Log('-' * 50)
+    Log('\n')
+    print("Error logged, check logs")
 
 def push_to_origin(branch):
     try:
@@ -118,35 +132,74 @@ def push_to_origin(branch):
 
 def run():
     if not is_active():
-        print(f"{YELLOW}Tool is disabled{RESET}")
+        print(f"Tool is disabled")
         sys.exit(1)
     dirs = read()
     if not dirs or len(dirs) == 0:
-        print(f"{YELLOW}No directories yet{RESET}")
+        Log(f"No directories yet")
         sys.exit(1)
     for dir in dirs:
-        print(f"---{BLUE}{dir}{RESET}")
+        Log(f">>>>>{dir}")
         try:
-            os.system(f"cd {dir} && git pull")
-        except Exception as e:
-            print(f"{RED}{e}{RESET}")
-            print(f"{RED}Try to pull manually{RESET}")
+            result = subprocess.run(f"cd {dir} && git pull", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            Log(result.stdout.decode())
+        except subprocess.CalledProcessError as e:
+            Log(str(time.ctime()) + " " + dir)
+            handle_exception(e.stderr.decode())
+            Log(f"Try to pull manually")
             continue
-        print(f"{GREEN}{dir} Up to date{RESET}")
+        Log(f"{dir} Up to date")
         try:
             push_to_origin(None)
         except Exception as e:
             if "git push --set-upstream origin" in str(e):
                 branch = str(e).split(" ")[-1]
                 if branch:
-                    print(f"{BLUE}Trying to push to {branch} branch{RESET}")
+                    Log(f"Trying to push to {branch} branch")
                     try:
                         push_to_origin(branch)
                     except Exception as e:
-                        print(f"{RED}{e}{RESET}")
+                        Log(str(time.ctime()) + " " + dir)
+                        handle_exception(e)
                         continue
             else:
-                print(f"{RED}{e}{RESET}")
+                Log(str(time.ctime()) + " " + dir)
+                handle_exception(e)
                 continue
-        print(f"{GREEN}{dir} Syncronized{RESET}")
-    print(f"{GREEN}All directories are up to date{RESET}")
+        Log(f"{dir} Syncronized at {time.ctime()}")
+    Log(f"All directories are up to date\n\n\n")
+
+# def run():
+#     if not is_active():
+#         print(f"{YELLOW}Tool is disabled{RESET}")
+#         sys.exit(1)
+#     dirs = read()
+#     if not dirs or len(dirs) == 0:
+#         print(f"{YELLOW}No directories yet{RESET}")
+#         sys.exit(1)
+#     for dir in dirs:
+#         print(f"---{BLUE}{dir}{RESET}")
+#         try:
+#             os.system(f"cd {dir} && git pull")
+#         except Exception as e:
+#             print(f"{RED}{e}{RESET}")
+#             print(f"{RED}Try to pull manually{RESET}")
+#             continue
+#         print(f"{GREEN}{dir} Up to date{RESET}")
+#         try:
+#             push_to_origin(None)
+#         except Exception as e:
+#             if "git push --set-upstream origin" in str(e):
+#                 branch = str(e).split(" ")[-1]
+#                 if branch:
+#                     print(f"{BLUE}Trying to push to {branch} branch{RESET}")
+#                     try:
+#                         push_to_origin(branch)
+#                     except Exception as e:
+#                         print(f"{RED}{e}{RESET}")
+#                         continue
+#             else:
+#                 print(f"{RED}{e}{RESET}")
+#                 continue
+#         print(f"{GREEN}{dir} Syncronized{RESET}")
+#     print(f"{GREEN}All directories are up to date{RESET}")
