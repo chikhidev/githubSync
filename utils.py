@@ -122,7 +122,7 @@ def push_to_origin(branch):
     try:
         os.system(f"cd {dir}")
         os.system("git add .")
-        os.system("git commit -m 'Syncronized by {app_name}'")
+        os.system(f"git commit -m 'Syncronized by {app_name}'")
         if branch:
             os.system(f"git push origin {branch}")
         else:
@@ -169,7 +169,7 @@ def run():
                 continue
         Log(f"{dir} Syncronized at {time.ctime()}")
         count += 1
-    Log(f"\n>>>>>All directories are up to date\nTotal synced: {count}\n\n\n")
+    Log(f"\n>>>>>{count}/{len(dirs)} syncronized without errors\n\n\n")
 
 # def run():
 #     if not is_active():
