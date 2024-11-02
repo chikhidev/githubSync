@@ -131,6 +131,7 @@ def push_to_origin(branch):
         print(f"{RED}{e}{RESET}")
 
 def run():
+    count = 0
     if not is_active():
         print(f"Tool is disabled")
         sys.exit(1)
@@ -167,7 +168,8 @@ def run():
                 handle_exception(e)
                 continue
         Log(f"{dir} Syncronized at {time.ctime()}")
-    Log(f"All directories are up to date\n\n\n")
+        count += 1
+    Log(f"\n>>>>>All directories are up to date\nTotal synced: {count}\n\n\n")
 
 # def run():
 #     if not is_active():
