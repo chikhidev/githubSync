@@ -4,6 +4,10 @@ from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 if __name__ == '__main__':
     try:
+        if not SYS == "LINUX":
+            print(f"{RED}This tool is only available for Linux :( i am sorry...{RESET}")
+            sys.exit(1)
+
         if not os.path.exists(data_file):
             with open(data_file, 'w') as f:
                 f.write("[]")

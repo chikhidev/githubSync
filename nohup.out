@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/home/abchikhi/githubSync/index.py", line 1, in <module>
+    from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run
+  File "/home/abchikhi/githubSync/utils.py", line 249
+    
+    ^
+SyntaxError: expected 'except' or 'finally' block
+Traceback (most recent call last):
+  File "/home/abchikhi/githubSync/index.py", line 1, in <module>
+    from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run
+  File "/home/abchikhi/githubSync/utils.py", line 249
+    
+    ^
+SyntaxError: expected 'except' or 'finally' block
+Traceback (most recent call last):
+  File "/home/abchikhi/githubSync/index.py", line 1, in <module>
+    from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run
+  File "/home/abchikhi/githubSync/utils.py", line 249
+    
+    ^
+SyntaxError: expected 'except' or 'finally' block

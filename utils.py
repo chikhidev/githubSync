@@ -210,3 +210,41 @@ def run():
 #                 continue
 #         print(f"{GREEN}{dir} Syncronized{RESET}")
 #     print(f"{GREEN}All directories are up to date{RESET}")
+
+
+
+#--------------------------------------------------------------------------
+def check_for_cron():
+    try:
+        if SYS == "LINUX":
+            if not os.path.exists(f"/etc/cron.d/{app_name}"):
+                os.system(f"touch /etc/cron.d/{app_name}")
+        else:
+            raise Exception("Windows not supported")
+    except Exception as e:
+        print(f"{RED}Error adding the cron job{RESET}")
+        print(f"{RED}{e}{RESET}")
+        sys.exit(1)
+
+def config(time):
+    try:
+        check_for_cron()
+
+        options = [
+            "each_30_minutes",
+            "each_hour",
+            "daily",
+            "weekly",
+            "monthly",
+        ]
+
+        if time not in options:
+            print(f"{RED}Invalid option{RESET}")
+            print(f"{YELLOW}Options:{RESET}")
+            for option in options:
+                print(f"---{BLUE}{option}{RESET}")
+            sys.exit(1)
+    except Exception as e:
+        print(f"{RED}Error adding the cron job{RESET}")
+        print(f"{RED}{e}{RESET}")
+        sys.exit(1)
