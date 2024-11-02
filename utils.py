@@ -130,6 +130,7 @@ def run():
             os.system(f"cd {dir} && git pull")
         except Exception as e:
             print(f"{RED}{e}{RESET}")
+            print(f"{RED}Try to pull manually{RESET}")
             continue
         print(f"{GREEN}{dir} Up to date{RESET}")
         try:
