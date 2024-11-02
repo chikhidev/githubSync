@@ -103,6 +103,19 @@ def is_active():
 
 
 #--------------------------------------------------------------------------
+
+def push_to_origin(branch):
+    try:
+        os.system(f"cd {dir}")
+        os.system("git add .")
+        os.system("git commit -m 'Syncronized by {app_name}'")
+        if branch:
+            os.system(f"git push origin {branch}")
+        else:
+            os.system("git push")
+    except Exception as e:
+        print(f"{RED}{e}{RESET}")
+
 def run():
     if not is_active():
         print(f"{YELLOW}Tool is disabled{RESET}")
@@ -120,12 +133,20 @@ def run():
             continue
         print(f"{GREEN}{dir} Up to date{RESET}")
         try:
-            os.system(f"cd {dir}")
-            os.system("git add .")
-            os.system("git commit -m 'Syncronized by {app_name}'")
-            os.system("git push")
+            push_to_origin(None)
         except Exception as e:
-            print(f"{RED}{e}{RESET}")
-            continue
+            if "git branch --set-upstream-to=origin/<branch>" in str(e):
+                print(f"{YELLOW}Branch not set, trying defualt branches[main, master]{RESET}")
+                try:
+                    push_to_origin("main")
+                except:
+                    try:
+                        push_to_origin("master")
+                    except Exception as e:
+                        print(f"{RED}{e}{RESET}")
+                        continue
+            else:
+                print(f"{RED}{e}{RESET}")
+                continue
         print(f"{GREEN}{dir} Syncronized{RESET}")
     print(f"{GREEN}All directories are up to date{RESET}")
