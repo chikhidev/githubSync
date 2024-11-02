@@ -1,4 +1,4 @@
-from global_ import data_file, user, SYS, os, json, sys
+from global_ import data_file, user, SYS, os, json, sys, app_name
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 def check_for_git(dir_path):
@@ -100,3 +100,32 @@ def is_active():
     except:
         return False
     return False
+
+
+#--------------------------------------------------------------------------
+def run():
+    if not is_active():
+        print(f"{YELLOW}Tool is disabled{RESET}")
+        sys.exit(1)
+    dirs = read()
+    if not dirs or len(dirs) == 0:
+        print(f"{YELLOW}No directories yet{RESET}")
+        sys.exit(1)
+    for dir in dirs:
+        print(f"---{BLUE}{dir}{RESET}")
+        try:
+            os.system(f"cd {dir} && git pull")
+        except Exception as e:
+            print(f"{RED}{e}{RESET}")
+            continue
+        print(f"{GREEN}{dir} Up to date{RESET}")
+        try:
+            os.system(f"cd {dir}")
+            os.system("git add .")
+            os.system("git commit -m 'Syncronized by {app_name}'")
+            os.system("git push")
+        except Exception as e:
+            print(f"{RED}{e}{RESET}")
+            continue
+        print(f"{GREEN}{dir} Syncronized{RESET}")
+    print(f"{GREEN}All directories are up to date{RESET}")

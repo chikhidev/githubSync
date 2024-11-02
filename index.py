@@ -1,4 +1,4 @@
-from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable
+from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run
 from global_ import data_file, user, SYS, os, json, sys, app_name
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
@@ -46,6 +46,8 @@ if __name__ == '__main__':
                 disable()
             else:
                 print(f"{YELLOW}Tool is already disabled{RESET}")
+        elif command == "run":
+            run()
         else:
             print(f"{RED}Invalid command{RESET}")
             sys.exit(1)
