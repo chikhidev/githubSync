@@ -283,9 +283,18 @@ def next_run(interval, duration=60):
     estimated_date = datetime.datetime.now() + datetime.timedelta(minutes=duration)
     Log(f"\nNext run will be at {estimated_date} \n")
 
-def run_scheduler():
-    Log(f"\nRunning queued tasks\n")
+def run_and_queue(duration=60):
     run_from_queue()
+    now = datetime.datetime.now()
+    target_time = now + datetime.timedelta(minutes=duration)
+    dirs = read()
+    for dir_ in dirs:
+        add_to_queue(dir_, target_time.timestamp())
+    next_run(read_interval(), duration)
+
+def run_scheduler():
+    Log(f"\nRunning queued tasks ⛰️\n")
+    run_and_queue(-1)
     
     duration = 60
     interval = read_interval()
@@ -298,27 +307,18 @@ def run_scheduler():
         if int(interval) < 60:
             duration = int(interval)
             schedule.every(int(interval)).minutes.do(run)
-            estimated_date = datetime.datetime.now() + datetime.timedelta(minutes=duration)
     except:
         pass
     if interval == 'daily':
         schedule.every().day.at("00:00").do(run)
-        estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(days=1)
-        Log(f"\nNext run will be at {estimated_date} ⏳\n")
+        duration = 60 * 24
     elif interval == 'weekly':
         schedule.every().week.at("00:00").do(run)
-        estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(weeks=1)
-        Log(f"\nNext run will be at {estimated_date} ⏳\n")
+        duration = 60 * 24 * 7
     elif interval == 'monthly':
         schedule.every().month.at("00:00").do(run)
-        estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(months=1)
-        Log(f"\nNext run will be at {estimated_date} ⏳\n")
-
-    dirs = read()
-    for dir_ in dirs:
-        add_to_queue(dir_, estimated_date.timestamp())
+        duration = 60 * 24 * 30
 
     while True:
         schedule.run_pending()
-        run_from_queue()
         time.sleep(2)
