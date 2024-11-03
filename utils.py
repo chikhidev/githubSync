@@ -246,16 +246,17 @@ def read_commit_message():
             sys.exit(1)
 
 #--------------------------------------------------------------------------
-def next_run(interval):
+def next_run(interval, duration=60):
     now = datetime.datetime.now()
     
     estimated_date = datetime.datetime.now() + datetime.timedelta(minutes=duration)
-    Log(f"\nNext run will be at {estimated_date} ⏳\n")
+    Log(f"\nNext run will be at {estimated_date} \n")
 
 def run_scheduler():
 
     duration = 60
     interval = read_interval()
+    now = datetime.datetime.now()
 
     Log(f"\nScheduler started with {interval} interval\n")
     estimated_date = -1
@@ -281,6 +282,5 @@ def run_scheduler():
 
     while True:
         schedule.run_pending()
-        time.sleep(1)
-        
+        time.sleep(2)
         
