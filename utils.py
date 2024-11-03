@@ -309,13 +309,12 @@ def run_scheduler():
     except:
         pass
     if interval == 'daily':
-
         duration = 60 * 24
     elif interval == 'weekly':
         duration = 60 * 24 * 7
     elif interval == 'monthly':
         duration = 60 * 24 * 30
-        
+    
     schedule.every(duration).minutes.do(run_and_queue, duration)
 
     while True:
