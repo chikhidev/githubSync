@@ -48,6 +48,7 @@ def remove(dir):
         dirs = read()
         dirs.remove(dir)
         save(dirs)
+        remove_from_queue(dir)
     except ValueError:
         print(f"{YELLOW}{dir} is not inserted{RESET}")
 
@@ -127,12 +128,12 @@ def push_to_origin(dir_):
     except Exception as e:
         print(f"{RED}{e}{RESET}")
 
-def run():
+def run(dirs=read()):
     count = 0
     if not is_active():
         print(f"Tool is disabled")
         sys.exit(1)
-    dirs = read()
+    
     if not dirs or len(dirs) == 0:
         Log(f"No directories yet")
         sys.exit(1)
@@ -231,6 +232,48 @@ def read_commit_message():
             sys.exit(1)
 
 #--------------------------------------------------------------------------
+def add_to_queue(dir_path, time_should_run):
+    try:
+        with open(queue_file, 'r') as f:
+            data = json.load(f)
+            data.append({
+                "dir": dir_path,
+                "time": time_should_run
+            })
+        with open(queue_file, 'w') as f:
+            json.dump(data, f)
+    except:
+        with open(queue_file, 'w') as f:
+            json.dump([{
+                "dir": dir_path,
+                "time": time_should_run
+            }], f)
+
+def remove_from_queue(dir_path):
+    try:
+        with open(queue_file, 'r') as f:
+            data = json.load(f)
+            data = [item for item in data if item["dir"] != dir_path]
+        with open(queue_file, 'w') as f:
+            json.dump(data, f)
+    except:
+        pass
+
+def read_queue():
+    try:
+        with open(queue_file, 'r') as f:
+            return json.load(f)
+    except:
+        return []
+    
+def run_from_queue():
+    dirs = read_queue()
+    for item in dirs:
+        if item["time"] < time.time():
+            run([item["dir"]])
+            dirs.remove(item)
+
+#--------------------------------------------------------------------------
 def next_run(interval, duration=60):
     now = datetime.datetime.now()
     
@@ -238,7 +281,6 @@ def next_run(interval, duration=60):
     Log(f"\nNext run will be at {estimated_date} \n")
 
 def run_scheduler():
-
     duration = 60
     interval = read_interval()
     now = datetime.datetime.now()
@@ -265,8 +307,11 @@ def run_scheduler():
         estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(months=1)
         Log(f"\nNext run will be at {estimated_date} ⏳\n")
 
+    dirs = read()
+    for dir_ in dirs:
+        add_to_queue(dir_, estimated_date)
+
     while True:
         schedule.run_pending()
+        run_from_queue()
         time.sleep(2)
-        
-
