@@ -292,6 +292,7 @@ def run_scheduler():
         if int(interval) < 60:
             duration = int(interval)
             schedule.every(int(interval)).minutes.do(run)
+            estimated_date = datetime.datetime.now() + datetime.timedelta(minutes=duration)
     except:
         pass
     if interval == 'daily':
@@ -309,7 +310,7 @@ def run_scheduler():
 
     dirs = read()
     for dir_ in dirs:
-        add_to_queue(dir_, estimated_date)
+        add_to_queue(dir_, estimated_date.timestamp())
 
     while True:
         schedule.run_pending()
