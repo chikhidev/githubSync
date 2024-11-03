@@ -16,6 +16,7 @@ if [ -f ~/.zshrc ]; then
     zsh
 
 elif [ -f ~/.bashrc ]; then
+    run_bash
     if ! grep -q 'alias gitsync="python3 ~/githubSync/index.py"' ~/.bashrc; then
         echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.bashrc
     fi
