@@ -266,15 +266,15 @@ def read_queue():
     except:
         return []
     
+def clear_queue():
+    with open(queue_file, 'w') as f:
+        json.dump([], f)
+    
 def run_from_queue():
     dirs = read_queue()
-    for item in dirs:
-        if item["time"] < time.time():
-            run([item["dir"]])
-            dirs.remove(item)
-            
-    with open(queue_file, 'w') as f:
-        json.dump(dirs, f)
+    paths = [item["dir"] for item in dirs]
+    run(paths)
+    clear_queue()
 
 #--------------------------------------------------------------------------
 def next_run(interval, duration=60):
