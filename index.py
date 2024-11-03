@@ -2,6 +2,25 @@ from utils import check_for_git, read, save, add, remove, prefix, guard, is_acti
 from global_ import data_file, user, SYS, os, json, sys, app_name
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
+def help_menu():
+    print(f"{GREEN}Commands:{RESET}")
+    print(f"{YELLOW}add, a, insert, i <directory>{RESET}")
+    print(f"\tUsed to add a directory to the synchronization list")
+    print(f"{YELLOW}remove, rm, delete, del <directory>{RESET}")
+    print(f"\tUsed to remove a directory from the synchronization list")
+    print(f"{YELLOW}list{RESET}")
+    print(f"\tUsed to list all directories in the synchronization list")
+    print(f"{YELLOW}enable{RESET}")
+    print("\tUsed to enable the synchronization tool, when disabled it does not synchronize directories")
+    print(f"{YELLOW}disable{RESET}")
+    print("\tUsed to disable the synchronization tool, when disabled it does not synchronize directories")
+    print(f"{YELLOW}config [-m, --message, -i, --interval]{RESET}")
+    print(f"\tUsed to configure the synchronization tool\nCommit message: -m, --message\nInterval: -i, --interval")
+    print(f"{YELLOW}run{RESET}")
+    print(f"\tUsed to synchronize all directories")
+    print(f"{YELLOW}run:scheduler{RESET}")
+    print(f"\tUsed to synchronize all directories according to the configured interval, [daily, weekly, monthly]")
+
 if __name__ == '__main__':
     try:
         if not SYS == "LINUX":
@@ -72,6 +91,8 @@ if __name__ == '__main__':
             run()
         elif command == "run:scheduler":
             run_scheduler()
+        elif command == "help":
+            help_menu()
         else:
             print(f"{RED}Invalid command{RESET}")
             sys.exit(1)
