@@ -201,10 +201,28 @@ def config(interval):
         print(f"{RED}{e}{RESET}")
 
 
+def read_interval():
+    try:
+        with open(config_file, 'r') as f:
+            return json.load(f)["interval"]
+    except:
+        print(f"{RED}File is corrupted{RESET}")
+        allow_reset = input(f"{YELLOW}Do you want to reset the file and continue, the interval will be set to daily by default? (y/n){RESET}")
+        if allow_reset.lower() == "y":
+            with open(config_file, 'w') as f:
+                f.write('{"interval": "daily"}')
+            print(f"{GREEN}File reset successfully with daily interval{RESET}")
+            return "daily"
+        else:
+            print(f"{RED}Exiting...{RESET}")
+            sys.exit(1)
+
+
 #--------------------------------------------------------------------------
-def run_scheduler(interval='daily'):
+def run_scheduler():
 
     duration = 60
+    interval = read_interval()
 
     Log(f"\nScheduler started with {interval} interval\n")
     estimated_date = -1
