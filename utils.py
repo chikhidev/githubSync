@@ -272,7 +272,7 @@ def clear_queue():
     
 def run_from_queue():
     dirs = read_queue()
-    paths = [item["dir"] for item in dirs]
+    paths = [item["dir"] for item in dirs if item["time"] < time.time()]
     run(paths)
     clear_queue()
 
