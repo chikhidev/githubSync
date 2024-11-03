@@ -281,6 +281,9 @@ def next_run(interval, duration=60):
     Log(f"\nNext run will be at {estimated_date} \n")
 
 def run_scheduler():
+    Log(f"\nRunning queued tasks\n")
+    run_from_queue()
+    
     duration = 60
     interval = read_interval()
     now = datetime.datetime.now()
