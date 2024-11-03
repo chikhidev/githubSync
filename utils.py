@@ -1,4 +1,4 @@
-from global_ import data_file, user, SYS, os, json, sys, app_name, subprocess, logs_file, time
+from global_ import data_file, user, SYS, os, json, sys, app_name, subprocess, logs_file, time, datetime, schedule, queue_file, config_file
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 def check_for_git(dir_path):
@@ -176,75 +176,61 @@ def run():
     Log("-" * 50 + "\n\n")
     print(final_message)
 
-# def run():
-#     if not is_active():
-#         print(f"{YELLOW}Tool is disabled{RESET}")
-#         sys.exit(1)
-#     dirs = read()
-#     if not dirs or len(dirs) == 0:
-#         print(f"{YELLOW}No directories yet{RESET}")
-#         sys.exit(1)
-#     for dir in dirs:
-#         print(f"---{BLUE}{dir}{RESET}")
-#         try:
-#             os.system(f"cd {dir} && git pull")
-#         except Exception as e:
-#             print(f"{RED}{e}{RESET}")
-#             print(f"{RED}Try to pull manually{RESET}")
-#             continue
-#         print(f"{GREEN}{dir} Up to date{RESET}")
-#         try:
-#             push_to_origin(None)
-#         except Exception as e:
-#             if "git push --set-upstream origin" in str(e):
-#                 branch = str(e).split(" ")[-1]
-#                 if branch:
-#                     print(f"{BLUE}Trying to push to {branch} branch{RESET}")
-#                     try:
-#                         push_to_origin(branch)
-#                     except Exception as e:
-#                         print(f"{RED}{e}{RESET}")
-#                         continue
-#             else:
-#                 print(f"{RED}{e}{RESET}")
-#                 continue
-#         print(f"{GREEN}{dir} Syncronized{RESET}")
-#     print(f"{GREEN}All directories are up to date{RESET}")
 
+#--------------------------------------------------------------------------
+def config(interval):
+    valid_intervals = ["daily", "weekly", "monthly"]
+    try:
+        # check if number and less than 60
+        if int(interval) > 60:
+            raise ValueError
+    except ValueError:
+        if interval not in valid_intervals:
+            print(f"{RED}Invalid interval{RESET}")
+            sys.exit(1)
+        
+    try:
+        json_content = {
+            "interval": interval
+        }
+
+        with open(config_file, 'w') as f:
+            json.dump(json_content, f)
+        print(f"{GREEN}Config set{RESET}")
+    except Exception as e:
+        print(f"{RED}{e}{RESET}")
 
 
 #--------------------------------------------------------------------------
-def check_for_cron():
+def run_scheduler(interval='daily'):
+
+    duration = 60
+
+    Log(f"\nScheduler started with {interval} interval\n")
+    estimated_date = -1
+    now = datetime.datetime.now()
+
     try:
-        if SYS == "LINUX":
-            if not os.path.exists(f"/etc/cron.d/{app_name}"):
-                os.system(f"touch /etc/cron.d/{app_name}")
-        else:
-            raise Exception("Windows not supported")
-    except Exception as e:
-        print(f"{RED}Error adding the cron job{RESET}")
-        print(f"{RED}{e}{RESET}")
-        sys.exit(1)
+        if int(interval) < 60:
+            duration = int(interval)
+            schedule.every(int(interval)).minutes.do(run)
+            estimated_date = datetime.datetime.now() + datetime.timedelta(minutes=duration)
+            Log(f"\nNext run will be at {estimated_date} ⏳\n")
+    except:
+        pass
+    if interval == 'daily':
+        schedule.every().day.at("00:00").do(run)
+        estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(days=1)
+        Log(f"\nNext run will be at {estimated_date} ⏳\n")
+    elif interval == 'weekly':
+        schedule.every().week.at("00:00").do(run)
+        estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(weeks=1)
+        Log(f"\nNext run will be at {estimated_date} ⏳\n")
+    elif interval == 'monthly':
+        schedule.every().month.at("00:00").do(run)
+        estimated_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) + datetime.timedelta(months=1)
+        Log(f"\nNext run will be at {estimated_date} ⏳\n")
 
-def config(time):
-    try:
-        check_for_cron()
-
-        options = [
-            "each_30_minutes",
-            "each_hour",
-            "daily",
-            "weekly",
-            "monthly",
-        ]
-
-        if time not in options:
-            print(f"{RED}Invalid option{RESET}")
-            print(f"{YELLOW}Options:{RESET}")
-            for option in options:
-                print(f"---{BLUE}{option}{RESET}")
-            sys.exit(1)
-    except Exception as e:
-        print(f"{RED}Error adding the cron job{RESET}")
-        print(f"{RED}{e}{RESET}")
-        sys.exit(1)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
