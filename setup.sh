@@ -7,8 +7,10 @@ for lib in ${libs[@]}; do
 done
 
 if [ -f ~/.zshrc ]; then
+    run_zsh = -2
     if ! grep -q 'alias gitsync="python3 ~/githubSync/index.py"' ~/.zshrc; then
         echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.zshrc
+        run_zsh+=1
     fi
     if ! grep -q 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' ~/.zshrc; then
         echo 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' >> ~/.zshrc
@@ -16,14 +18,18 @@ if [ -f ~/.zshrc ]; then
     zsh
 
 elif [ -f ~/.bashrc ]; then
-    run_bash
+    run_bash=-2
     if ! grep -q 'alias gitsync="python3 ~/githubSync/index.py"' ~/.bashrc; then
         echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.bashrc
+        run_bash+=1
     fi
     if ! grep -q 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' ~/.bashrc; then
         echo 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' >> ~/.bashrc
+        run_bash+=1
     fi
-    source ~/.bashrc
+    if [ $run_bash -gt 0 ]; then
+        source ~/.bashrc
+    fi
 else
     echo "No .zshrc or .bashrc file found"
 fi
