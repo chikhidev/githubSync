@@ -200,8 +200,6 @@ def config_interval(interval):
     except Exception as e:
         print(f"{RED}{e}{RESET}")
 
-    
-
 def read_interval():
     try:
         with open(config_file, 'r') as f:
@@ -281,3 +279,5 @@ def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
+        
+        

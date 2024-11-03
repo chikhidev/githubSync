@@ -57,8 +57,9 @@ if __name__ == '__main__':
                 print(f"{YELLOW}No directories yet{RESET}")
                 sys.exit(1)
             print(f"{GREEN}Directories:{RESET}")
+            index = 1
             for dir in dirs:
-                print(f"---{BLUE}{dir}{RESET}")
+                print(f"---@{index} {BLUE}{dir}{RESET}")
         elif command == "enable":
             if not enabled:
                 enable()
