@@ -106,7 +106,6 @@ def is_active():
 #--------------------------------------------------------------------------
 def Log(message):
     try:
-        print(logs_file)
         if not os.path.exists(logs_file):
             os.system(f"touch {logs_file}") if SYS == "LINUX" else os.system(f"echo. 2> {logs_file}")
         with open(logs_file, 'a') as f:
