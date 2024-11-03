@@ -246,7 +246,9 @@ def read_commit_message():
             sys.exit(1)
 
 #--------------------------------------------------------------------------
-def next_run(now, interval):
+def next_run(interval):
+    now = datetime.datetime.now()
+    
     estimated_date = datetime.datetime.now() + datetime.timedelta(minutes=duration)
     Log(f"\nNext run will be at {estimated_date} ⏳\n")
 
@@ -257,13 +259,11 @@ def run_scheduler():
 
     Log(f"\nScheduler started with {interval} interval\n")
     estimated_date = -1
-    now = datetime.datetime.now()
 
     try:
         if int(interval) < 60:
             duration = int(interval)
             schedule.every(int(interval)).minutes.do(run)
-            scheduled_time = now + datetime.timedelta(minutes=duration)
     except:
         pass
     if interval == 'daily':
