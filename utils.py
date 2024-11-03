@@ -1,4 +1,4 @@
-from global_ import data_file, user, SYS, os, json, sys, app_name, subprocess, logs_file, time, datetime, schedule, queue_file, config_file
+from global_ import data_file, user, SYS, os, json, sys, app_name, subprocess, logs_file, time, datetime, schedule, queue_file, config_file, default_config
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 def check_for_git(dir_path):
@@ -122,7 +122,7 @@ def push_to_origin(branch):
     try:
         os.system(f"cd {dir}")
         os.system("git add .")
-        os.system(f"git commit -m 'Syncronized by {app_name}'")
+        os.system(f"git commit -m '{read_commit_message()}'")
         if branch:
             os.system(f"git push origin {branch}")
         else:
@@ -178,10 +178,9 @@ def run():
 
 
 #--------------------------------------------------------------------------
-def config(interval):
+def config_interval(interval):
     valid_intervals = ["daily", "weekly", "monthly"]
     try:
-        # check if number and less than 60
         if int(interval) > 60:
             raise ValueError
     except ValueError:
@@ -191,7 +190,8 @@ def config(interval):
         
     try:
         json_content = {
-            "interval": interval
+            "interval": interval,
+            "commit_message": read_commit_message()
         }
 
         with open(config_file, 'w') as f:
@@ -200,6 +200,7 @@ def config(interval):
     except Exception as e:
         print(f"{RED}{e}{RESET}")
 
+    
 
 def read_interval():
     try:
@@ -210,13 +211,41 @@ def read_interval():
         allow_reset = input(f"{YELLOW}Do you want to reset the file and continue, the interval will be set to daily by default? (y/n){RESET}")
         if allow_reset.lower() == "y":
             with open(config_file, 'w') as f:
-                f.write('{"interval": "daily"}')
+                f.write(default_config)
             print(f"{GREEN}File reset successfully with daily interval{RESET}")
             return "daily"
         else:
             print(f"{RED}Exiting...{RESET}")
             sys.exit(1)
 
+def config_commit_message(message):
+    try:
+        json_content = {
+            "interval": read_interval(),
+            "commit_message": message
+        }
+
+        with open(config_file, 'w') as f:
+            json.dump(json_content, f)
+        print(f"{GREEN}Config set{RESET}")
+    except Exception as e:
+        print(f"{RED}{e}{RESET}")
+
+def read_commit_message():
+    try:
+        with open(config_file, 'r') as f:
+            return json.load(f)["commit_message"]
+    except:
+        print(f"{RED}File is corrupted{RESET}")
+        allow_reset = input(f"{YELLOW}Do you want to reset the file and continue, the commit message will be set to 'Syncronized by gitsync' by default? (y/n){RESET}")
+        if allow_reset.lower() == "y":
+            with open(config_file, 'w') as f:
+                f.write(default_config)
+            print(f"{GREEN}File reset successfully with default commit message{RESET}")
+            return "Syncronized by gitsync"
+        else:
+            print(f"{RED}Exiting...{RESET}")
+            sys.exit(1)
 
 #--------------------------------------------------------------------------
 def run_scheduler():

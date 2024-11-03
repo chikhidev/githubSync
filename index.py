@@ -1,4 +1,4 @@
-from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run, run_scheduler, config
+from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run, run_scheduler, config_interval, config_commit_message
 from global_ import data_file, user, SYS, os, json, sys, app_name
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
@@ -52,9 +52,22 @@ if __name__ == '__main__':
                 print(f"{YELLOW}Tool is already disabled{RESET}")
         elif command == "config":
             if len(sys.argv) < 3:
-                print(f"{RED}Missing interval argument [NUMBER, daily, weekly, monthly]{RESET}")
+                print(f"{RED}Missing specifier [-m, --message, -i, --interval]{RESET}")
                 sys.exit(1)
-            config(sys.argv[2])
+            specifier = sys.argv[2]
+            if specifier == "-i" or specifier == "--interval":
+                if len(sys.argv) < 4:
+                    print(f"{RED}Missing interval argument [NUMBER, daily, weekly, monthly]{RESET}")
+                    sys.exit(1)
+                config_interval(sys.argv[3])
+            elif specifier == "-m" or specifier == "--message":
+                if len(sys.argv) < 4:
+                    print(f"{RED}Missing message argument{RESET}")
+                    sys.exit(1)
+                config_commit_message(sys.argv[3])
+            else:
+                print(f"{RED}Invalid specifier{RESET}")
+                sys.exit(1)
         elif command == "run":
             run()
         elif command == "run:scheduler":
