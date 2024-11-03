@@ -1,5 +1,5 @@
 from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run, run_scheduler, config_interval, config_commit_message
-from global_ import data_file, user, SYS, os, json, sys, app_name
+from global_ import data_file, user, SYS, os, json, sys, app_name, project_root
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 def help_menu():
@@ -26,10 +26,13 @@ if __name__ == '__main__':
         if not SYS == "LINUX":
             print(f"{RED}This tool is only available for Linux :( i am sorry...{RESET}")
             sys.exit(1)
+            
+        if not os.path.exists(project_root):
+            os.mkdir(project_root)
 
         if not os.path.exists(data_file):
             with open(data_file, 'w') as f:
-                f.write("[]")
+                json.dump([], f)
 
         if len(sys.argv) == 1:
             print(f"{YELLOW}Use '{app_name} help' to see the available commands{RESET}")

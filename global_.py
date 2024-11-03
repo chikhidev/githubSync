@@ -8,10 +8,14 @@ import schedule
 
 app_name = "gitsync"
 system = os.name
-SYS = "LINUX" if system == 'posix' else "WINDOWS"
-data_file = "__dirs.json"
+SYS = "LINUX" if system == 'posix' else "OTHER"
 user = os.getlogin()
-logs_file = f"/home/{user}/{app_name}.log" if SYS == "LINUX" else f"C:\\Users\\{user}\\{app_name}.log"
-queue_file = "__queue"
-config_file = "__config.json"
+home = os.path.expanduser("~")
+project_root = os.path.join(home, f".__{app_name}")
+
+logs_file = project_root + "/__" + app_name + ".log"
+data_file = project_root + "/__dirs.json"
+queue_file = project_root + "/__queue.json"
+config_file = project_root + "/__config.json"
+
 default_config = '{"interval": "daily", "commit_message": "Syncronized by gitsync"}'

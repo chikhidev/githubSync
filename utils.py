@@ -33,6 +33,7 @@ def save(dirs):
 
 def add(dir_):
     dirs = read()
+    
     check_for_permissions(dir_)
     check_for_git(dir_)
     if dir_ not in dirs:
@@ -57,7 +58,8 @@ def prefix(dir_path):
         return os.path.dirname(os.getcwd())
     elif dir_path == "~":
         return f"/home/{user}" if SYS == "LINUX" else f"C:\\Users\\{user}"
-    return dir_path
+    print("Please use cd to the project you want to add and use 'add .'")
+    exit(1)
 
 def guard(argv):
     if len(argv) < 3:
@@ -104,6 +106,7 @@ def is_active():
 #--------------------------------------------------------------------------
 def Log(message):
     try:
+        print(logs_file)
         if not os.path.exists(logs_file):
             os.system(f"touch {logs_file}") if SYS == "LINUX" else os.system(f"echo. 2> {logs_file}")
         with open(logs_file, 'a') as f:
