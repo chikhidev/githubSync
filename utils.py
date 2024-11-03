@@ -285,12 +285,7 @@ def next_run(interval, duration=60):
 
 def run_and_queue(duration=60):
     run_from_queue()
-    now = datetime.datetime.now()
-    target_time = now + datetime.timedelta(minutes=duration)
-    dirs = read()
-    for dir_ in dirs:
-        add_to_queue(dir_, target_time.timestamp())
-    next_run(read_interval(), duration)
+    if 
 
 def run_scheduler():
     Log(f"\nRunning queued tasks ⛰️\n")
