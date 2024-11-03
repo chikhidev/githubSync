@@ -131,7 +131,6 @@ def push_to_origin(branch):
         print(f"{RED}{e}{RESET}")
 
 def run():
-    Log("-" * 50)
     count = 0
     if not is_active():
         print(f"Tool is disabled")
@@ -173,7 +172,7 @@ def run():
 
     final_message = f">>>>>{count}/{len(dirs)} syncronized without errors 🐫"
     Log(f"\n{final_message}")
-    Log("-" * 50 + "\n\n")
+    Log("-" * len(final_message))
     print(final_message)
 
 
