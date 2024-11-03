@@ -121,15 +121,10 @@ def handle_exception(e):
     Log('\n')
     print("Error logged, check logs")
 
-def push_to_origin(branch):
+def push_to_origin(dir_):
     try:
-        os.system(f"cd {dir}")
-        os.system("git add .")
-        os.system(f"git commit -m '{read_commit_message()}'")
-        if branch:
-            os.system(f"git push origin {branch}")
-        else:
-            os.system("git push")
+        result = subprocess.run(f"cd {dir_} && git add . && git commit -m '{read_commit_message()}' && git push", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        Log(result.stdout.decode())
     except Exception as e:
         print(f"{RED}{e}{RESET}")
 
@@ -142,35 +137,24 @@ def run():
     if not dirs or len(dirs) == 0:
         Log(f"No directories yet")
         sys.exit(1)
-    for dir in dirs:
-        Log(f">>>>>{dir}")
+    for dir_ in dirs:
+        Log(f">>>>>{dir_}")
         try:
-            result = subprocess.run(f"cd {dir} && git pull", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.run(f"cd {dir_} && git pull", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             Log(result.stdout.decode())
         except subprocess.CalledProcessError as e:
-            Log(str(time.ctime()) + " " + dir)
+            Log(str(time.ctime()) + " " + dir_)
             handle_exception(e.stderr.decode())
             Log(f"Try to pull manually")
             continue
-        Log(f"{dir} Up to date")
+        Log(f"{dir_} Up to date")
         try:
-            push_to_origin(None)
+            push_to_origin(dir_)
         except Exception as e:
-            if "git push --set-upstream origin" in str(e):
-                branch = str(e).split(" ")[-1]
-                if branch:
-                    Log(f"Trying to push to {branch} branch")
-                    try:
-                        push_to_origin(branch)
-                    except Exception as e:
-                        Log(str(time.ctime()) + " " + dir)
-                        handle_exception(e)
-                        continue
-            else:
-                Log(str(time.ctime()) + " " + dir)
-                handle_exception(e)
-                continue
-        Log(f"{dir} Syncronized at {time.ctime()}")
+            Log(str(time.ctime()) + " " + dir_)
+            handle_exception(e)
+            continue
+        Log(f"{dir_} Syncronized at {time.ctime()}")
         count += 1
 
     final_message = f">>>>>{count}/{len(dirs)} syncronized without errors 🐫"
