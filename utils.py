@@ -138,7 +138,7 @@ def run(dirs=read()):
         Log(f"No directories yet")
         sys.exit(1)
     for dir_ in dirs:
-        Log(f"\n>>>>>{dir_}")
+        Log(f"\n>>>>>{dir_}<<<<<")
         try:
             result = subprocess.run(f"cd {dir_} && git pull", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             Log(result.stdout.decode())
