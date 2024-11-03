@@ -272,6 +272,9 @@ def run_from_queue():
         if item["time"] < time.time():
             run([item["dir"]])
             dirs.remove(item)
+            
+    with open(queue_file, 'w') as f:
+        json.dump(dirs, f)
 
 #--------------------------------------------------------------------------
 def next_run(interval, duration=60):
