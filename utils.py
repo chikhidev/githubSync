@@ -285,7 +285,12 @@ def next_run(interval, duration=60):
 
 def run_and_queue(duration=60):
     run_from_queue()
-    if 
+    now = datetime.datetime.now()
+    target_time = now + datetime.timedelta(minutes=duration)
+    dirs = read()
+    for dir_ in dirs:
+        add_to_queue(dir_, target_time.timestamp())
+    next_run(read_interval(), duration)
 
 def run_scheduler():
     Log(f"\nRunning queued tasks ⛰️\n")
@@ -301,18 +306,17 @@ def run_scheduler():
     try:
         if int(interval) < 60:
             duration = int(interval)
-            schedule.every(int(interval)).minutes.do(run)
     except:
         pass
     if interval == 'daily':
-        schedule.every().day.at("00:00").do(run)
+
         duration = 60 * 24
     elif interval == 'weekly':
-        schedule.every().week.at("00:00").do(run)
         duration = 60 * 24 * 7
     elif interval == 'monthly':
-        schedule.every().month.at("00:00").do(run)
         duration = 60 * 24 * 30
+        
+    schedule.every(duration).minutes.do(run_and_queue, duration)
 
     while True:
         schedule.run_pending()
