@@ -7,13 +7,21 @@ for lib in ${libs[@]}; do
 done
 
 if [ -f ~/.zshrc ]; then
-    echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.zshrc
-    echo 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' >> ~/.zshrc
+    if ! grep -q 'alias gitsync="python3 ~/githubSync/index.py"' ~/.zshrc; then
+        echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.zshrc
+    fi
+    if ! grep -q 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' ~/.zshrc; then
+        echo 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' >> ~/.zshrc
+    fi
     zsh
 
 elif [ -f ~/.bashrc ]; then
-    echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.bashrc
-    echo 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' >> ~/.bashrc
+    if ! grep -q 'alias gitsync="python3 ~/githubSync/index.py"' ~/.bashrc; then
+        echo 'alias gitsync="python3 ~/githubSync/index.py"' >> ~/.bashrc
+    fi
+    if ! grep -q 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' ~/.bashrc; then
+        echo 'pgrep -f "gitsync run:scheduler" > /dev/null || gitsync run:scheduler &' >> ~/.bashrc
+    fi
     source ~/.bashrc
 else
     echo "No .zshrc or .bashrc file found"
