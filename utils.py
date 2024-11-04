@@ -199,7 +199,7 @@ def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
             subprocess.run(["git", "add", "."], check=True)
             subprocess.run(["git", "commit", "-m", read_commit_message() + " merge at " + time.ctime()], check=True)
             subprocess.run(["git", "checkout", gitsync_branch_], check=True)
-            subprocess.run(["git", "merge", origin_branch], check=True)
+            subprocess.run(["git", "merge", origin_branch, "--strategy-option=theirs"], check=True)
         else:
             subprocess.run(["git", "checkout", origin_branch], check=True)
             subprocess.run(["git", "checkout", "-B", gitsync_branch_], check=True)
