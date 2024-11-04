@@ -1,5 +1,4 @@
 # GitSync
-
 GitSync is a tool to keep your local git directories up to date by synchronizing them at regular intervals. It supports daily, weekly, and monthly synchronization schedules.
 
 ## Features
@@ -10,6 +9,8 @@ GitSync is a tool to keep your local git directories up to date by synchronizing
 - Enable or disable the synchronization tool
 - Configure synchronization interval and commit message
 - Run synchronization manually or on a schedule
+- Logs synchronization activities to a log file
+- Queues synchronization tasks to ensure they run even if the computer is shut down before the scheduled time
 
 ## Installation
 
@@ -95,6 +96,8 @@ This script will install the necessary Python libraries and set up an alias for 
 
 - The tool is only available for Linux.
 - Ensure that the directories you add are valid git repositories and you have the necessary permissions to access them.
+- Synchronization activities are logged to a log file located at `~/.gitsync/gitsync.log`.
+- Synchronization tasks are queued to ensure they run even if the computer is shut down before the scheduled time.
 
 ## License
 
