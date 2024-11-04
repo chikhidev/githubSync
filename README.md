@@ -41,19 +41,11 @@ This script will install the necessary Python libraries and set up an alias for 
 
 - Add a directory to the synchronization list:
     ```sh
-    gitsync add /path/to/directory
-    ```
-    or
-    ```sh
     cd /path/to/directory
     gitsync add .
     ```
 
 - Remove a directory from the synchronization list:
-    ```sh
-    gitsync remove /path/to/directory
-    ```
-    or
     ```sh
     cd /path/to/directory
     gitsync remove .
