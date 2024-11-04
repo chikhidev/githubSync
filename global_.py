@@ -19,3 +19,5 @@ config_file = project_root + "/config.json"
 enable_file = project_root + "/enable"
 
 default_config = '{"interval": "daily", "commit_message": "Syncronized by gitsync"}'
+
+gitsync_branch = "gitsync_"

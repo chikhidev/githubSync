@@ -16,6 +16,7 @@ from global_ import (
     default_config,
     enable_file,
     project_root,
+    gitsync_branch
 )
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
@@ -175,16 +176,33 @@ def handle_exception(e):
     print("Error logged, check logs")
 
 
-def push_to_origin(dir_):
+def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
     try:
-        result = subprocess.run(
-            f"cd {dir_} && git add . && git commit -m '{read_commit_message()}' && git push",
+        
+        gitsync_branch_exists = subprocess.run(
+            f"cd {dir_} && git branch --list {gitsync_branch_}",
             shell=True,
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        Log(result.stdout.decode())
+        
+        if gitsync_branch_exists.stdout.decode().strip():
+            result = subprocess.run(
+                f"cd {dir_} && git add . && git commit -m '{read_commit_message()}' && git push origin '{gitsync_branch_}'",
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            Log(result.stdout.decode())
+        else:
+            result = subprocess.run(
+                f"cd {dir_} && git add . && git commit -m '{read_commit_message()}' && git branch -M '{gitsync_branch_}' && git push -u origin '{gitsync_branch_}'",
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            Log(result.stdout.decode())
     except Exception as e:
         print(f"{RED}{e}{RESET}")
 
@@ -200,7 +218,7 @@ def run(dirs=read()):
         sys.exit(1)
     for dir_ in dirs:
         Log(f"\n>>>>>{dir_}<<<<<")
-        try:
+        try: 
             result = subprocess.run(
                 f"cd {dir_} && git pull",
                 shell=True,
@@ -216,7 +234,18 @@ def run(dirs=read()):
             continue
         Log(f"{dir_} Up to date")
         try:
-            push_to_origin(dir_)
+            
+            current_branch = subprocess.run(
+                f"cd {dir_} && git branch --show-current",
+                shell=True,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            
+            origin_branch = current_branch.stdout.decode().strip()
+            gitsync_branch_ = f"{gitsync_branch}{origin_branch}"
+            push_to_origin(dir_, gitsync_branch_, origin_branch)
         except Exception as e:
             Log(str(time.ctime()) + " " + dir_)
             handle_exception(e)
