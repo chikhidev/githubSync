@@ -195,10 +195,10 @@ def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
                 raise Exception("Not a git repository")
             
             os.chdir(dir_)
-            result = subprocess.run(["git", "add", "."])
-            result = subprocess.run(["git", "commit", "-m", read_commit_message()])
-            result = subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
-            result = subprocess.run(["git", "checkout", origin_branch])
+            subprocess.run(["git", "add", "."])
+            subprocess.run(["git", "commit", "-m", read_commit_message()])
+            subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
+            subprocess.run(["git", "checkout", origin_branch])
             
         else:
             if not os.path.exists(f"{dir_}/.git"):
@@ -206,14 +206,15 @@ def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
                 raise Exception("Not a git repository")
             
             os.chdir(dir_)
-            result = subprocess.run(["git", "checkout", "-B", gitsync_branch_])
-            result = subprocess.run(["git", "add", "."])
-            result = subprocess.run(["git", "commit", "-m", read_commit_message()])
-            result = subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
-            result = subprocess.run(["git", "checkout", origin_branch])
+            subprocess.run(["git", "checkout", "-B", gitsync_branch_])
+            subprocess.run(["git", "add", "."])
+            subprocess.run(["git", "commit", "-m", read_commit_message()])
+            subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
+            subprocess.run(["git", "checkout", origin_branch])
             
     except Exception as e:
         print(f"{RED}{e}{RESET}")
+        Log(str(time.ctime()) + " " + dir_)
 
 
 def run(dirs=read()):
