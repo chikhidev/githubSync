@@ -1,5 +1,5 @@
-from utils import check_for_git, read, save, add, remove, prefix, guard, is_active, enable, disable, run, run_scheduler, config_interval, config_commit_message
-from global_ import data_file, user, SYS, os, json, sys, app_name, project_root
+from utils import read, add, remove, guard, is_active, enable, disable, run, run_scheduler, config_interval, config_commit_message, init
+from global_ import user, SYS, os, json, sys, app_name, project_root, logs_file, queue_file, config_file, data_file
 from colors import RED, RESET, GREEN, YELLOW, BLUE
 
 def help_menu():
@@ -20,33 +20,36 @@ def help_menu():
     print(f"\tUsed to synchronize all directories")
     print(f"{YELLOW}run:scheduler{RESET}")
     print(f"\tUsed to synchronize all directories according to the configured interval, [daily, weekly, monthly]")
+    
+def warn_if_disabled(enabled):
+    if not enabled and ["enable", "disable", "help"].count(command) == 0:
+        print(f"{YELLOW}-{RESET}" * 66)
+        print(f"{YELLOW}Tool is disabled: that means your directories are not synchronized{RESET}")
+        print(f'{YELLOW}Use "{app_name} enable" to enable the tool{RESET}')
+        print(f'{YELLOW}Or create a file named ".gitsync" in /home/{user} or C:\\Users\\{user} to enable it{RESET}')
+        print(f"{YELLOW}-{RESET}" * 66)
 
 if __name__ == '__main__':
     try:
         if not SYS == "LINUX":
-            print(f"{RED}This tool is only available for Linux :( i am sorry...{RESET}")
+            print(f"{RED}This tool is only available for Linux i am sorry...{RESET}")
             sys.exit(1)
             
-        if not os.path.exists(project_root):
-            os.mkdir(project_root)
-
-        if not os.path.exists(data_file):
-            with open(data_file, 'w') as f:
-                json.dump([], f)
-
+        init()
+            
+        enabled = is_active()
+        
         if len(sys.argv) == 1:
-            print(f"{YELLOW}Use '{app_name} help' to see the available commands{RESET}")
+            if enabled:
+                print(f"{YELLOW}By default, calling run:scheduler{RESET}")
+                run_scheduler()
+            else:
+                print(f"{YELLOW}The tool is disabled, use 'enable' to enable it{RESET}")
             sys.exit(1)
 
         command = sys.argv[1]
 
-        enabled = is_active()
-        if not enabled and ["enable", "disable", "help"].count(command) == 0:
-            print(f"{YELLOW}-{RESET}" * 66)
-            print(f"{YELLOW}Tool is disabled: that means your directories are not synchronized{RESET}")
-            print(f'{YELLOW}Use "{app_name} enable" to enable the tool{RESET}')
-            print(f'{YELLOW}Or create a file named ".gitsync" in /home/{user} or C:\\Users\\{user} to enable it{RESET}')
-            print(f"{YELLOW}-{RESET}" * 66)
+        warn_if_disabled(enabled)
 
         if command == "add" or command == "a" or command == "insert" or command == "i":
             dir_path = guard(sys.argv)
@@ -63,6 +66,7 @@ if __name__ == '__main__':
             index = 1
             for dir in dirs:
                 print(f"---@{index} {BLUE}{dir}{RESET}")
+                index += 1
         elif command == "enable":
             if not enabled:
                 enable()
@@ -95,11 +99,13 @@ if __name__ == '__main__':
             run()
         elif command == "run:scheduler":
             run_scheduler()
+        elif command == "init":
+            init()
         elif command == "help":
             help_menu()
         else:
             print(f"{RED}Invalid command{RESET}")
             sys.exit(1)
-    except KeyboardInterrupt:
+    except:
         print(f"{RED}Exiting...{RESET}")
         sys.exit(1)
