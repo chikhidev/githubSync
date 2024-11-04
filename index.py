@@ -45,7 +45,8 @@ if __name__ == '__main__':
                 run_scheduler()
             else:
                 print(f"{YELLOW}The tool is disabled, use 'enable' to enable it{RESET}")
-            sys.exit(1)
+                sys.exit(1)
+            sys.exit(0)
 
         command = sys.argv[1]
 
@@ -106,6 +107,6 @@ if __name__ == '__main__':
         else:
             print(f"{RED}Invalid command{RESET}")
             sys.exit(1)
-    except:
+    except KeyboardInterrupt:
         print(f"{RED}Exiting...{RESET}")
         sys.exit(1)

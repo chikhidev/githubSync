@@ -368,10 +368,8 @@ def run_scheduler():
 
     duration = 60
     interval = read_interval()
-    now = datetime.datetime.now()
 
     Log(f"\nScheduler started with {interval} interval\n")
-    estimated_date = -1
 
     try:
         if int(interval) < 60:
