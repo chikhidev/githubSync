@@ -187,22 +187,31 @@ def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
             stderr=subprocess.PIPE,
         )
         
+        print(f"{GREEN}gitsync_branch_exists: {gitsync_branch_exists.stdout.decode().strip()}{RESET}")
+        
         if gitsync_branch_exists.stdout.decode().strip():
-            result = subprocess.run(
-                f"cd {dir_} && git add . && git commit -m '{read_commit_message()}' && git push origin '{gitsync_branch_}'",
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            Log(result.stdout.decode())
+            if not os.path.exists(f"{dir_}/.git"):
+                print(f"{RED}Not a git repository{RESET}")
+                raise Exception("Not a git repository")
+            
+            os.chdir(dir_)
+            result = subprocess.run(["git", "add", "."])
+            result = subprocess.run(["git", "commit", "-m", read_commit_message()])
+            result = subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
+            result = subprocess.run(["git", "checkout", origin_branch])
+            
         else:
-            result = subprocess.run(
-                f"cd {dir_} && git add . && git commit -m '{read_commit_message()}' && git branch -M '{gitsync_branch_}' && git push -u origin '{gitsync_branch_}'",
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            Log(result.stdout.decode())
+            if not os.path.exists(f"{dir_}/.git"):
+                print(f"{RED}Not a git repository{RESET}")
+                raise Exception("Not a git repository")
+            
+            os.chdir(dir_)
+            result = subprocess.run(["git", "checkout", "-B", gitsync_branch_])
+            result = subprocess.run(["git", "add", "."])
+            result = subprocess.run(["git", "commit", "-m", read_commit_message()])
+            result = subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
+            result = subprocess.run(["git", "checkout", origin_branch])
+            
     except Exception as e:
         print(f"{RED}{e}{RESET}")
 
