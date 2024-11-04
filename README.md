@@ -26,8 +26,8 @@ This script will install the necessary Python libraries and set up an alias for 
 
 ### Commands
 
-- `add <directory>`: Add a directory to the synchronization list
-- `remove <directory>`: Remove a directory from the synchronization list
+- `add .`: Add a directory to the synchronization list
+- `remove .`: Remove a directory from the synchronization list
 - `list`: List all directories in the synchronization list
 - `enable`: Enable the synchronization tool
 - `disable`: Disable the synchronization tool
