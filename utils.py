@@ -197,7 +197,7 @@ def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
             os.chdir(dir_)
             subprocess.run(["git", "add", "."])
             subprocess.run(["git", "commit", "-m", read_commit_message()])
-            subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
+            subprocess.run(["git", "push", "origin", gitsync_branch_])
             subprocess.run(["git", "checkout", origin_branch])
             
         else:
@@ -209,7 +209,7 @@ def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
             subprocess.run(["git", "checkout", "-B", gitsync_branch_])
             subprocess.run(["git", "add", "."])
             subprocess.run(["git", "commit", "-m", read_commit_message()])
-            subprocess.run(["git", "push", "-u", "origin", gitsync_branch_])
+            subprocess.run(["git", "push", "origin", gitsync_branch_])
             subprocess.run(["git", "checkout", origin_branch])
             
     except Exception as e:
