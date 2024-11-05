@@ -102,6 +102,19 @@ if __name__ == '__main__':
             run_scheduler()
         elif command == "init":
             init()
+        elif command == "version" or command == "--version" or command == "-v":
+            print(f"{GREEN}Version: 1.0.0{RESET}")
+        elif command == "status":
+            if enabled:
+                print(f"{GREEN}Tool is enabled{RESET}")
+            else:
+                print(f"{YELLOW}Tool is disabled{RESET}")
+        elif command == "logs":
+            os.system(f"open {logs_file}")
+        elif command == "logs:clear":
+            with open(logs_file, "w") as f:
+                f.write("")
+            print(f"{GREEN}Logs cleared{RESET}")
         elif command == "help":
             help_menu()
         else:

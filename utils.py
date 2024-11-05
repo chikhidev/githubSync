@@ -156,115 +156,155 @@ def is_active():
 
 
 # --------------------------------------------------------------------------
-def Log(message):
+def Log(message, end="\n"):
     try:
         if not os.path.exists(logs_file):
-            os.system(f"touch {logs_file}") if SYS == "LINUX" else os.system(
-                f"echo. 2> {logs_file}"
-            )
+            os.system(f"touch {logs_file}")
         with open(logs_file, "a") as f:
-            f.write(f"{message}\n")
+            f.write(f"{message}" + end)
     except Exception as e:
         print(f"{RED}Error logging the error{RESET}")
 
 
 def handle_exception(e):
-    Log("-" * 50)
     Log(e)
-    Log("-" * 50)
     Log("\n")
     print("Error logged, check logs")
 
 
 def push_to_origin(dir_, gitsync_branch_, origin_branch="main"):
+    """
+    Pushes changes from the gitsync_branch_ to the origin_branch in the given directory.
+    
+    Args:
+        dir_ (str): The directory containing the Git repository.
+        gitsync_branch_ (str): The branch to push changes from.
+        origin_branch (str, optional): The branch to push changes to. Defaults to "main".
+    """
     try:
-        
         gitsync_branch_exists = subprocess.run(
-           ["git", "branch", "--list", gitsync_branch_],
+            ["git", "branch", "--list", gitsync_branch_],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-           
-        print(f"{GREEN}gitsync_branch_exists: {gitsync_branch_exists.stdout.decode().strip()}{RESET}")
+
+        Log(f"gitsync_branch_exists: {gitsync_branch_exists.stdout.decode().strip()}")
         
         if not os.path.exists(f"{dir_}/.git"):
-                print(f"{RED}Not a git repository{RESET}")
-                raise Exception("Not a git repository")
+            Log(f"Error: Not a git repository")
+            raise Exception("Not a git repository")
         
         os.chdir(dir_)
         
         if gitsync_branch_exists.stdout.decode().strip():
+
+            Log(f"Checking out {origin_branch} branch")
             subprocess.run(["git", "checkout", origin_branch], check=True)
+
+            Log("Adding all changes")
             subprocess.run(["git", "add", "."], check=True)
+
+            Log(f"Committing changes with message: '{read_commit_message()} merge at {time.ctime()}'")
             subprocess.run(["git", "commit", "-m", read_commit_message() + " merge at " + time.ctime()], check=True)
+
+            Log(f"Checking out {gitsync_branch_} branch")
             subprocess.run(["git", "checkout", gitsync_branch_], check=True)
+
+            Log(f"Merging {origin_branch} into {gitsync_branch_}")
             subprocess.run(["git", "merge", origin_branch, "--strategy-option=theirs"], check=True)
-        else:
-            subprocess.run(["git", "checkout", origin_branch], check=True)
-            subprocess.run(["git", "checkout", "-B", gitsync_branch_], check=True)
 
-        subprocess.run(["git", "add", "."])
-        subprocess.run(["git", "commit", "-m", read_commit_message()], check=True)
-        subprocess.run(["git", "push", "origin", gitsync_branch_, "--force"], check=True)
-        subprocess.run(["git", "checkout", origin_branch], check=True)
+            Log(f"Pushing {gitsync_branch_} to origin")
+            subprocess.run(["git", "push", "--set-upstream", "origin", gitsync_branch_], check=True)
             
-    except Exception as e:
-        print(f"{RED}{e}{RESET}")
-        Log(str(time.ctime()) + " " + dir_)
+        else:
 
+            Log(f"Checking out {origin_branch} branch")
+            subprocess.run(["git", "checkout", origin_branch], check=True)
+            
+            Log(f"Creating and checking out {gitsync_branch_} branch")
+            subprocess.run(["git", "checkout", "-B", gitsync_branch_], check=True)
+            
+            Log(f"Pushing {gitsync_branch_} to origin (force)")
+            subprocess.run(["git", "add", "."])
+            
+            Log(f"Committing initial commit with message: '[{read_commit_message()}] Initial commit at {time.ctime()}'")
+            subprocess.run(["git", "commit", "-m", "[" + read_commit_message() + "] Initial commit at " + time.ctime()], check=True)
+            
+            Log(f"Pushing {gitsync_branch_} to origin (force)")
+            subprocess.run(["git", "push", "origin", gitsync_branch_, "--force"], check=True)
+            
+            Log(f"Checking out {origin_branch} branch")
+            subprocess.run(["git", "checkout", origin_branch], check=True)
+    except Exception as e:
+        Log(f"Error throwed: {e} [push_to_origin]")
+        subprocess.run(["git", "checkout", origin_branch], check=True)
 
 def run(dirs=read()):
+    """
+    Runs the push_to_origin function for each directory in the dirs list.
+    
+    Args:
+        dirs (list, optional): A list of directories to process. Defaults to read().
+    """
     count = 0
     if not is_active():
-        print(f"Tool is disabled")
+        Log("Tool is disabled")
         sys.exit(1)
 
     if not dirs or len(dirs) == 0:
-        Log(f"No directories yet")
-        sys.exit(1)
+        Log("No directories to run")
+        return
     for dir_ in dirs:
-        Log(f"\n>>>>>{dir_}<<<<<")
+        msg = f"| {dir_} |"
+        Log("")
+        Log("+", "")
+        Log("-" * (len(msg) - 2), "")
+        Log("+")
+        Log(msg)
+        Log("+", "")
+        Log("-" * (len(msg) - 2), "")
+        Log("+")
+
+        current_branch = subprocess.run(
+            f"cd {dir_} && git branch --show-current",
+            shell=True,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
         try: 
+            os.chdir(dir_)
+
+            Log(f"Pulling latest changes from {current_branch.stdout.decode().strip()} branch")
             result = subprocess.run(
-                f"cd {dir_} && git pull",
-                shell=True,
+                ["git", "pull", "origin", current_branch.stdout.decode().strip()],
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
             Log(result.stdout.decode())
         except subprocess.CalledProcessError as e:
-            Log(str(time.ctime()) + " " + dir_)
-            handle_exception(e.stderr.decode())
-            Log(f"Try to pull manually")
+            Log("Try to pull manually in the directory: " + dir_)
+            subprocess.run(["notify-send", f"gitsync: unable to pull in {dir_}"])
             continue
-        Log(f"{dir_} Up to date")
-        try:
-            
-            current_branch = subprocess.run(
-                f"cd {dir_} && git branch --show-current",
-                shell=True,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            
+        Log(f"{dir_} is up to date")
+        try:            
             origin_branch = current_branch.stdout.decode().strip()
             gitsync_branch_ = f"{gitsync_branch}{origin_branch}"
             push_to_origin(dir_, gitsync_branch_, origin_branch)
         except Exception as e:
-            Log(str(time.ctime()) + " " + dir_)
+            Log(f"Error in directory: {dir_}")
+            subprocess.run(["notify-send", f"gitsync: error in {dir_}"])
             handle_exception(e)
             continue
-        Log(f"{dir_} Syncronized at {time.ctime()}")
+        Log(f"{dir_} synchronized")
         count += 1
 
-    final_message = f">>>>>{count}/{len(dirs)} syncronized without errors 🐫"
+    final_message = f"{count}/{len(dirs)} directories synchronized without errors 🐫"
     Log(f"\n{final_message}")
     Log("-" * len(final_message))
     print(final_message)
-
 
 # --------------------------------------------------------------------------
 def config_interval(interval):
@@ -399,7 +439,7 @@ def run_and_queue(duration=60):
 
 
 def run_scheduler():
-    Log(f"\nRunning queued tasks ⛰️\n")
+    Log(f"Running queued tasks ⛰️ " + time.ctime())
     run_and_queue(-1)
 
     duration = 60
